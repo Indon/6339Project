@@ -3,20 +3,19 @@
 #1000882451
 
 #Contains code based on code from my assignment 2.
-#Contains code very loosely based on pseudocode from the wikipedia article on quicksort. How detailed do I have to make these citations anyway?
 
 import json
 import time
 import math
 from operator import itemgetter
 
-class Test_junk:
+class Decision_trees:
     def __init__(self):
         #Opens every data file and builds a dictionary of dictionaries for each of them. The Business, Reviews, and Users dictionaries have keys equal to their
         #respective ID's. The Tips have both business and userID and that's it.
         self.TrainingReviews={}
-        self.TestReviews={}
         self.ValidationReviews={}
+        self.TestReviews={}
         self.Businesses={}
         self.Users={}
         self.Tips={}
@@ -56,11 +55,11 @@ class Test_junk:
                     #20% of the reviews in the training set; 32,000.
                     self.TrainingReviews[filedic['review_id']] = filedic
                 elif count%5==1:
-                    #20% more of the reviews in the test set; another 32,000.
-                    self.TestReviews[filedic['review_id']] = filedic
-                else:
-                    #The rest of the reviews in the validation set. 96,000. All these are estimates.
+                    #20% more of the reviews in the validation set; another 32,000.
                     self.ValidationReviews[filedic['review_id']] = filedic
+                else:
+                    #The rest of the reviews in the testing set. 96,000. All these are estimates.
+                    self.TestReviews[filedic['review_id']] = filedic
 
             if count%10000==0:
                 print((str)(count) + ' Reviews loaded.')
@@ -260,6 +259,9 @@ class Test_junk:
         for item in self.Attributes:
             item['Used']=False
         
+        #Run 2.
+        #self.Attributes[0],self.Attributes[6]=self.Attributes[6],self.Attributes[0]
+        
         #Used for run 3.
         #self.Attributes[0],self.Attributes[10]=self.Attributes[10],self.Attributes[0]
         #self.Attributes[1],self.Attributes[9]=self.Attributes[9],self.Attributes[1]
@@ -269,36 +271,9 @@ class Test_junk:
         
         #Used for run 4.
         #self.Attributes[0],self.Attributes[5]=self.Attributes[5],self.Attributes[0]
-        
-        #Businesses. "attributes" (A dictionary of a bunch of attributes which may or may not be present), "business_id" (should be key in dictionary)
-        #"categories"(set of strings), "city", "full_address" (basically immaterial), "hours"(dictionary with up to 7 day-of-week entries, each of which is a
-        #dictionary with "open" and "close" entries), "latitude", "longitude", "name", "neighborhoods" (a set), "open", "review_count", "stars", "state", "type"
-        #file=open('J:\School\Data Mining\Project\Files\yelp_dataset_challenge_academic_dataset\yelp_academic_dataset_business.json','r')
-        
-        #Checkins. "business_id", "checkin_info" (a dictionary consisting of a series of things I don't actually understand, associated with numbers)
-        #file=open('J:\School\Data Mining\Project\Files\yelp_dataset_challenge_academic_dataset\yelp_academic_dataset_checkin.json','r')
-        #Reviews, almost 1,570,000. "business_id", "date", "review_id" (use as key), "stars" (class variable?), "text", "type", "user_id",
-        #"votes" (dictionary with "cool", "funny", "useful" entries)
-        #file=open('J:\School\Data Mining\Project\Files\yelp_dataset_challenge_academic_dataset\yelp_academic_dataset_review.json','r')
-        #Tips. About 495K entries. "business_id", "date", "likes", "text", "type", "user_id"
-        #file=open('J:\School\Data Mining\Project\Files\yelp_dataset_challenge_academic_dataset\yelp_academic_dataset_tip.json','r')
-        #Contains user data, about 360K entries. "average_stars", "compliments" (Dictionary), "elite" (set), "fans", "friends" (set), "name", "review_count", "type",
-        #"user_id" (should be used as dictionary key), "votes"(dictionary with "cool", "funny", "useful" entries), "yelping_since"
-        #file=open('J:\School\Data Mining\Project\Files\yelp_dataset_challenge_academic_dataset\yelp_academic_dataset_user.json','r')
-        
-        
-        
-        #filestrings=file.readlines()
-        #print(filestrings)
-        #count=0
-        #for line in filestrings:
-        #    count=count+1
-        #    filedic=json.loads(line)
-        #    if count%10000==0: #filedic["likes"]>3:
-        #        print(count)
-        #        print(json.dumps(filedic,sort_keys=True, indent=3))
-            #print(str(count) + ',' + json.dumps(filedic))
-    
+
+
+       
     #For counting things like votes.
     def dictionaryitemcount(self, dictionaryItems):
         returnVal=0
@@ -320,7 +295,7 @@ class Test_junk:
         endtime=time.time()
         print('Decision tree generated in ' + (str) (endtime-starttime) + ' seconds.')
         starttime=time.time()
-        accuracy=self.classify_all(base_decision_tree,self.ValidationReviews)
+        accuracy=self.classify_all(base_decision_tree,self.TestReviews)
         endtime=time.time()
         print('Decision tree evaluated in ' + (str) (endtime-starttime) + ' seconds.')
         print('Accuracy rate is  ' + (str)(accuracy) + ' percent.')
@@ -335,7 +310,7 @@ class Test_junk:
         print('Sorting took ' + (str)(self.comparison_count) + ' comparisons.')
         finaltree=self.build_sorted_node(self.TrainingReviews,0)
         starttime=time.time()
-        accuracy=self.classify_all(finaltree,self.ValidationReviews)
+        accuracy=self.classify_all(finaltree,self.TestReviews)
         endtime=time.time()
         print('Decision tree evaluated in ' + (str) (endtime-starttime) + ' seconds.')
         print('Final accuracy rate against validation data is  ' + (str)(accuracy) + ' percent.')
@@ -397,7 +372,7 @@ class Test_junk:
         endtime=time.time()
         tree_building_time=endtime-starttime
         starttime=time.time()
-        accuracy=self.classify_all(base_decision_tree,self.TestReviews)
+        accuracy=self.classify_all(base_decision_tree,self.ValidationReviews)
         endtime=time.time()
         classify_time=endtime-starttime
         print((str)(tree_building_time) + ',' + (str)(classify_time) + ',' + (str)(accuracy) + ',' + attributeorder)
@@ -740,7 +715,10 @@ class Test_junk:
 
 
 
-Stuff = Test_junk()
+Stuff = Decision_trees()
 
+#This code provides the baseline results.
 #Stuff.base_tree()
+
+#This code provides the experimental results.
 Stuff.sorted_tree()
