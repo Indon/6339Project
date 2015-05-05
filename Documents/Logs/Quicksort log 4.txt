@@ -1,0 +1,41 @@
+13.607778072357178,3.212183952331543,0.34439756793646853,Review Votes,Business review_count,Business Stars,Business Hours,Review Year,Business Categories,User votes Count,User fans,User friends Count,User review_count,User average_stars
+13.818791151046753,3.0861759185791016,0.36204864127062913,User average_stars,Business review_count,Business Stars,Business Hours,Review Year,Business Categories,User votes Count,User fans,User friends Count,User review_count,Review Votes
+Items 0 and 0 will be swapped.
+12.51771593093872,3.208184003829956,0.34439756793646853,Review Votes,Business review_count,Business Stars,Business Hours,Review Year,Business Categories,User votes Count,User fans,User friends Count,User review_count,User average_stars
+14.001800060272217,3.72221302986145,0.34439756793646853,Review Votes,User votes Count,Business Stars,Business Hours,Review Year,Business Categories,User average_stars,User fans,User friends Count,User review_count,Business review_count
+13.873794078826904,3.3051888942718506,0.3601563469413079,Review Votes,Business review_count,User average_stars,Business Hours,Review Year,Business Categories,User votes Count,User fans,User friends Count,User review_count,Business Stars
+Items 2 and 1 will be swapped.
+12.541717052459717,3.212183952331543,0.34439756793646853,Review Votes,Business Stars,Business review_count,Business Hours,Review Year,Business Categories,User votes Count,User fans,User friends Count,User review_count,User average_stars
+41.68738412857056,10.504601001739502,0.4015076312197543,Review Votes,Business Stars,Business review_count,User votes Count,Review Year,Business Categories,User average_stars,User fans,User friends Count,User review_count,Business Hours
+Items 3 and 2 will be swapped.
+9.853564023971558,2.3081319332122803,0.34439756793646853,Review Votes,Business Stars,Business Hours,Business review_count,Review Year,Business Categories,User average_stars,User fans,User friends Count,User review_count,User votes Count
+8.65249514579773,2.316131830215454,0.34439756793646853,Review Votes,Business Stars,Business Hours,Business review_count,User average_stars,Business Categories,User votes Count,User fans,User friends Count,User review_count,Review Year
+9.870564937591553,2.3111321926116943,0.34439756793646853,Review Votes,Business Stars,Business Hours,Business review_count,Review Year,User votes Count,User average_stars,User fans,User friends Count,User review_count,Business Categories
+8.63249397277832,2.31413197517395,0.34439756793646853,Review Votes,Business Stars,Business Hours,Business review_count,Review Year,Business Categories,User average_stars,User fans,User friends Count,User review_count,User votes Count
+9.791559934616089,2.3031320571899414,0.34439756793646853,Review Votes,Business Stars,Business Hours,Business review_count,Review Year,Business Categories,User average_stars,User votes Count,User friends Count,User review_count,User fans
+8.659494876861572,2.2791311740875244,0.34439756793646853,Review Votes,Business Stars,Business Hours,Business review_count,Review Year,Business Categories,User votes Count,User fans,User average_stars,User review_count,User friends Count
+9.805560111999512,2.3141329288482666,0.34439756793646853,Review Votes,Business Stars,Business Hours,Business review_count,Review Year,Business Categories,User average_stars,User fans,User friends Count,User votes Count,User review_count
+8.688497066497803,2.3061318397521973,0.34439756793646853,Review Votes,Business Stars,Business Hours,Business Categories,Review Year,Business review_count,User votes Count,User fans,User friends Count,User review_count,User average_stars
+9.745557069778442,2.0611178874969482,0.34439756793646853,Business review_count,Business Stars,Business Hours,Business Categories,Review Year,Review Votes,User votes Count,User fans,User friends Count,User review_count,User average_stars
+8.710498094558716,2.2401280403137207,0.3421640402034992,Review Votes,Business Categories,Business Hours,Business review_count,Review Year,Business Stars,User votes Count,User fans,User friends Count,User review_count,User average_stars
+21.4152250289917,5.038287878036499,0.3445526740290359,Review Votes,Business Stars,Business review_count,Business Categories,Review Year,Business Hours,User votes Count,User fans,User friends Count,User review_count,User average_stars
+Items 2 and 0 will be swapped.
+1.9201099872589111,0.18601107597351074,0.34203995532944537,Business Hours,Business Stars,Review Votes,Business Categories,Review Year,Business review_count,User votes Count,User fans,User friends Count,User review_count,User average_stars
+0.7910449504852295,0.1870110034942627,0.34203995532944537,Business Hours,Business Stars,Review Votes,Business Categories,Review Year,Business review_count,User votes Count,User fans,User friends Count,User review_count,User average_stars
+0.7780439853668213,0.19501113891601562,0.34203995532944537,Business Hours,Business Stars,Review Votes,Business Categories,Business review_count,Review Year,User votes Count,User fans,User friends Count,User review_count,User average_stars
+0.7260420322418213,0.17900991439819336,0.34203995532944537,Business Hours,Business Stars,Review Votes,Business review_count,Review Year,Business Categories,User votes Count,User fans,User friends Count,User review_count,User average_stars
+9.674553871154785,2.283130168914795,0.34439756793646853,Review Votes,Business Stars,Business Hours,Business review_count,Review Year,Business Categories,User votes Count,User fans,User friends Count,User review_count,User average_stars
+Items 0 and 0 will be swapped.
+0.7700438499450684,0.18801116943359375,0.34203995532944537,Business Hours,Business Stars,Review Votes,Business review_count,Review Year,Business Categories,User votes Count,User fans,User friends Count,User review_count,User average_stars
+0.7910449504852295,0.18601107597351074,0.34203995532944537,Business Hours,Review Votes,Business Stars,Business review_count,Review Year,Business Categories,User votes Count,User fans,User friends Count,User review_count,User average_stars
+0.7950448989868164,0.1890110969543457,0.34203995532944537,Business Hours,Business Stars,Review Votes,Business review_count,Review Year,Business Categories,User votes Count,User fans,User friends Count,User review_count,User average_stars
+0.7990458011627197,0.1890110969543457,0.34203995532944537,Business Hours,Business Stars,Review Votes,Business review_count,Business Categories,Review Year,User votes Count,User fans,User friends Count,User review_count,User average_stars
+1.954111099243164,0.1890108585357666,0.34203995532944537,Business Hours,Business Stars,Review Votes,Business review_count,Review Year,Business Categories,User votes Count,User fans,User friends Count,User average_stars,User review_count
+0.7890450954437256,0.18801093101501465,0.34203995532944537,Business Hours,Business Stars,Review Votes,Business review_count,Review Year,Business Categories,User votes Count,User review_count,User friends Count,User average_stars,User fans
+0.8030459880828857,0.19201111793518066,0.34203995532944537,Business Hours,Business Stars,Review Votes,Business review_count,Review Year,Business Categories,User votes Count,User fans,User average_stars,User review_count,User friends Count
+0.7550430297851562,0.18101096153259277,0.34203995532944537,Business Hours,Business Stars,Review Votes,Business review_count,Review Year,Business Categories,User votes Count,User fans,User friends Count,User review_count,User average_stars
+0.7300410270690918,0.18201112747192383,0.34203995532944537,Business Hours,Business Stars,Review Votes,Business review_count,Review Year,Business Categories,User votes Count,User fans,User friends Count,User review_count,User average_stars
+0.738041877746582,0.18601107597351074,0.34203995532944537,Business Hours,Business Stars,Review Votes,Business review_count,Review Year,Business Categories,User votes Count,User friends Count,User fans,User review_count,User average_stars
+Sorting took 33 comparisons.
+Decision tree evaluated in 0.5640320777893066 seconds.
+Final accuracy rate against validation data is  0.3449801979174207 percent.

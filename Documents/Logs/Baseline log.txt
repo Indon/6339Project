@@ -1,0 +1,7 @@
+Decision tree generated in 235.56047296524048 seconds.
+Decision tree evaluated in 31.33279299736023 seconds.
+Accuracy rate is  0.4052964108079043 percent.
+
+Decision tree generated in 235.79148602485657 seconds.
+Decision tree evaluated in 31.439799070358276 seconds.
+Accuracy rate is  0.4052964108079043 percent.
