@@ -3,6 +3,7 @@
 #1000882451
 
 #Contains code based on code from my assignment 2.
+#Contains code very loosely based on pseudocode from the wikipedia article on quicksort. How detailed do I have to make these citations anyway?
 
 import json
 import time
@@ -21,7 +22,8 @@ class Test_junk:
         self.Tips={}
         self.Checkins={}
         
-        
+        self.comparison_count=0
+        self.current_sorted_accuracy=0
 
         
         file=open('J:\School\Data Mining\Project\Files\yelp_dataset_challenge_academic_dataset\yelp_academic_dataset_business.json','r')
@@ -36,8 +38,8 @@ class Test_junk:
                 self.Businesses[filedic['business_id']] = filedic
             #Businesses.append(filedic)
             if count%10000==0:
-                print(count)
-                print(json.dumps(filedic,sort_keys=True, indent=3))
+                print((str)(count) + ' Businesses parsed.') #These count parsed items. Everything else counts only included ones.
+                #print(json.dumps(filedic,sort_keys=True, indent=3))
 
         
         file=open('J:\School\Data Mining\Project\Files\yelp_dataset_challenge_academic_dataset\yelp_academic_dataset_review.json','r')        
@@ -61,8 +63,8 @@ class Test_junk:
                     self.ValidationReviews[filedic['review_id']] = filedic
 
             if count%10000==0:
-                print(count)
-                print(json.dumps(filedic,sort_keys=True, indent=3))
+                print((str)(count) + ' Reviews loaded.')
+                #print(json.dumps(filedic,sort_keys=True, indent=3))
        
         file=open('J:\School\Data Mining\Project\Files\yelp_dataset_challenge_academic_dataset\yelp_academic_dataset_user.json','r')
         filestrings=file.readlines()
@@ -74,8 +76,8 @@ class Test_junk:
             #360K users, because can't readily tell if a user has made a review in the subset I picked.
             self.Users[filedic['user_id']] = filedic
             if count%10000==0:
-                print(count)
-                print(json.dumps(filedic,sort_keys=True, indent=3))
+                print((str)(count) + ' Users loaded.')
+                #print(json.dumps(filedic,sort_keys=True, indent=3))
                 
                 
         file=open('J:\School\Data Mining\Project\Files\yelp_dataset_challenge_academic_dataset\yelp_academic_dataset_tip.json','r')
@@ -93,8 +95,8 @@ class Test_junk:
                 count=count+1
             #Tips.append(filedic)
             if count%10000==0:
-                print(count)
-                print(json.dumps(filedic,sort_keys=True, indent=3))                
+                print((str)(count) + ' Tips loaded.')
+                #print(json.dumps(filedic,sort_keys=True, indent=3))                
                 
                 
         file=open('J:\School\Data Mining\Project\Files\yelp_dataset_challenge_academic_dataset\yelp_academic_dataset_checkin.json','r')
@@ -109,8 +111,8 @@ class Test_junk:
                 self.Checkins[filedic['business_id']] = filedic
                 count=count+1
             if count%1000==0:
-                print(count)
-                print(json.dumps(filedic,sort_keys=True, indent=3))
+                print((str)(count) + ' Checkins loaded.')
+                #print(json.dumps(filedic,sort_keys=True, indent=3))
 
 
         #So, I need to build a knowledge base for everything associated with a given review.
@@ -166,14 +168,7 @@ class Test_junk:
         #temp['Existence']=False
         #temp['Count']=False
         #Attributes.append(temp)
-        
-        temp={}
-        temp['Name']='Business Hours'
-        temp['Location']='business'
-        temp['Existence']=True
-        temp['Count']=False
-        self.Attributes.append(temp)
-        
+
         temp={}
         temp['Name']='Business Categories'
         temp['Location']='business'
@@ -192,6 +187,13 @@ class Test_junk:
         temp['Name']='Business Stars'
         temp['Location']='business'
         temp['Existence']=False
+        temp['Count']=False
+        self.Attributes.append(temp)
+
+        temp={}
+        temp['Name']='Business Hours'
+        temp['Location']='business'
+        temp['Existence']=True
         temp['Count']=False
         self.Attributes.append(temp)
         
@@ -258,6 +260,16 @@ class Test_junk:
         for item in self.Attributes:
             item['Used']=False
         
+        #Used for run 3.
+        #self.Attributes[0],self.Attributes[10]=self.Attributes[10],self.Attributes[0]
+        #self.Attributes[1],self.Attributes[9]=self.Attributes[9],self.Attributes[1]
+        #self.Attributes[2],self.Attributes[8]=self.Attributes[8],self.Attributes[2]
+        #self.Attributes[3],self.Attributes[7]=self.Attributes[7],self.Attributes[3]
+        #self.Attributes[4],self.Attributes[6]=self.Attributes[6],self.Attributes[4]
+        
+        #Used for run 4.
+        #self.Attributes[0],self.Attributes[5]=self.Attributes[5],self.Attributes[0]
+        
         #Businesses. "attributes" (A dictionary of a bunch of attributes which may or may not be present), "business_id" (should be key in dictionary)
         #"categories"(set of strings), "city", "full_address" (basically immaterial), "hours"(dictionary with up to 7 day-of-week entries, each of which is a
         #dictionary with "open" and "close" entries), "latitude", "longitude", "name", "neighborhoods" (a set), "open", "review_count", "stars", "state", "type"
@@ -316,9 +328,91 @@ class Test_junk:
         return 0
     
     def sorted_tree(self):
-        start
+        #Baseline accuracy for the way the order currently is. Every time we modify the order this should update.
+        #Removed because accuracy without pivot in place is way off.
+        #self.current_sorted_accuracy=self.swap_attributes_test(0,0)
+        self.attribute_quicksort(0,len(self.Attributes)-1)
+        print('Sorting took ' + (str)(self.comparison_count) + ' comparisons.')
+        finaltree=self.build_sorted_node(self.TrainingReviews,0)
         starttime=time.time()
+        accuracy=self.classify_all(finaltree,self.ValidationReviews)
+        endtime=time.time()
+        print('Decision tree evaluated in ' + (str) (endtime-starttime) + ' seconds.')
+        print('Final accuracy rate against validation data is  ' + (str)(accuracy) + ' percent.')
         
+    #Pass: Integer address 
+    def move_attribute_to_front(attributelocation):
+        pass
+    
+    #Both parameters are addressses in self.Attributes.
+    #Note that this is not a parallelizable version of quicksort, due to how attribute value testing functions.
+    #Without copying the attributes list (which is possible but I'm not doing on my desktop because I'm already worried
+    #about space and I don't have enough cores to possibly make a difference even if I parallelized this which I won't),
+    #only one comparison can be made at a time.
+    def attribute_quicksort(self, lowaddress,highaddress):
+        pivotloc=self.quicksort_partition(lowaddress,highaddress)
+        if not(pivotloc==highaddress):
+            self.attribute_quicksort(lowaddress,pivotloc-1)
+            self.attribute_quicksort(pivotloc+1,highaddress)
+        pass
+    
+    def quicksort_partition(self, lowaddress, highaddress):
+        if highaddress>lowaddress:
+            pivotloc=(int)(math.floor(((lowaddress+1)+(highaddress+1))/2))
+            temploc=lowaddress
+            
+            self.Attributes[highaddress],self.Attributes[pivotloc]=self.Attributes[pivotloc],self.Attributes[highaddress]
+            #We need a baseline for accuracy after the pivot element is placed.
+            self.current_sorted_accuracy=self.swap_attributes_test(0,0)
+            for i in range(lowaddress,highaddress):
+                #This is the part that makes this project interesting-the items are being ordered by comparison to something
+                #else instead of each other. Since these items are unlikely to have a total order, this might produce
+                #fascinating results.
+                #Note also: Each swap will produce two 
+                tempaccuracy=self.swap_attributes_test(i,highaddress)
+                if tempaccuracy>self.current_sorted_accuracy:
+                    print('Items ' + (str)(i) + ' and ' + (str)(temploc) + ' will be swapped.')
+                    self.current_sorted_accuracy=self.swap_attributes_test(i,temploc)
+                    self.Attributes[i],self.Attributes[temploc]=self.Attributes[temploc],self.Attributes[i]
+                    temploc=temploc+1
+                #And now we move the pivot back into its new location. Done! Hopefully.
+                self.Attributes[highaddress],self.Attributes[pivotloc]=self.Attributes[pivotloc],self.Attributes[highaddress]
+            return pivotloc
+        else:
+            return highaddress
+        
+    #Tests the accuracy rate of the sorted tree made by swapping two items by making a sorted tree with that order.
+    #Returns the accuracy rate of the resulting test.
+    #After executing, prints the time to build the decision tree, time to test it, accuracy rate, and a list of nodes.
+    #This is basically how we define comparing two values for the purposes of this sort: Based on their resulting
+    #testing accuracy rates after building decision trees for them.
+    def swap_attributes_test(self, item1address,item2address):
+        self.comparison_count=self.comparison_count+1
+        #Swap the items.
+        self.Attributes[item1address],self.Attributes[item2address]=self.Attributes[item2address],self.Attributes[item1address]
+        attributeorder=self.print_comma_separated_attributes()
+        attributeorder
+        starttime=time.time()
+        base_decision_tree=self.build_sorted_node(self.TrainingReviews,0)
+        endtime=time.time()
+        tree_building_time=endtime-starttime
+        starttime=time.time()
+        accuracy=self.classify_all(base_decision_tree,self.TestReviews)
+        endtime=time.time()
+        classify_time=endtime-starttime
+        print((str)(tree_building_time) + ',' + (str)(classify_time) + ',' + (str)(accuracy) + ',' + attributeorder)
+        #Then let's swap stuff back so the sorting algorithm can make the real decision.
+        self.Attributes[item1address],self.Attributes[item2address]=self.Attributes[item2address],self.Attributes[item1address]
+        return accuracy
+    
+    #Returns a string of all attributes, comma-separated.
+    def print_comma_separated_attributes(self):
+        returnval=''
+        for item in self.Attributes:
+            returnval=returnval+item['Name']+','
+        #Remove the final comma.
+        returnval=returnval[:-1]
+        return returnval
     
     #This classification function doesn't output the actual classification, and is purely for use on validation/testing data.
     #Returns a number between 0 and 1 reflecting classification accuracy.
@@ -367,7 +461,7 @@ class Test_junk:
         result['Entropy']=self.calculate_node_entropy(training_dictionary)
         currententropy=result['Entropy']
         
-        print('Now classifying set of ' + len(training_dictionary) + 'items')
+        #print('Now classifying set of ' + (str)(len(training_dictionary)) + 'items')
         
         if len(training_dictionary)>5 and sort_level<len(self.Attributes):
             sortingattribute=self.Attributes[sort_level]
@@ -388,16 +482,19 @@ class Test_junk:
                     return self.build_sorted_node(training_dictionary, sort_level+1)
             else:
                 #Boolean variable. True/False Split.
-                tempentropy=self.set_entropy(len([item for item in workingset if workingset[0]==True]),len([item for item in workingset if workingset[0]==False]))
-                if tempentropy['Entropy']<currententropy:
-                    currententropy=tempentropy['Entropy']
-                    result['Split By']=sortingattribute
-                    result['Nodes']=self.split_dictionary(sortingattribute['Existence'],0,workingset,training_dictionary)
-                    result['Breakpoint']=splitdata[0]
-                    for i in range(2):
-                        result['Nodes'][i]=self.build_sorted_node(result['Nodes'][i],sort_level+1)
-                else:
-                    return self.build_sorted_node(training_dictionary, sort_level+1)
+                truecount=len([item for item in workingset if workingset[0]==True])
+                falsecount=len([item for item in workingset if workingset[0]==False])                
+                if truecount>0 and falsecount>0:
+                    tempentropy=self.set_entropy([truecount,falsecount])                
+                    if tempentropy['Entropy']<currententropy:
+                        currententropy=tempentropy['Entropy']
+                        result['Split By']=sortingattribute
+                        result['Nodes']=self.split_dictionary(sortingattribute['Existence'],0,workingset,training_dictionary)
+                        result['Breakpoint']=splitdata[0]
+                        for i in range(2):
+                            result['Nodes'][i]=self.build_sorted_node(result['Nodes'][i],sort_level+1)
+                    else:
+                        return self.build_sorted_node(training_dictionary, sort_level+1)
         return result
     
     def build_base_node(self, training_dictionary):
