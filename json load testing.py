@@ -5,13 +5,17 @@
 #Contains code based on code from my assignment 2.
 
 import json
-
+import time
+import math
+from operator import itemgetter
 
 class Test_junk:
     def __init__(self):
         #Opens every data file and builds a dictionary of dictionaries for each of them. The Business, Reviews, and Users dictionaries have keys equal to their
         #respective ID's. The Tips have both business and userID and that's it.
-        self.Reviews={}
+        self.TrainingReviews={}
+        self.TestReviews={}
+        self.ValidationReviews={}
         self.Businesses={}
         self.Users={}
         self.Tips={}
@@ -45,8 +49,17 @@ class Test_junk:
             #Only add review if about business we're loading.
             #About 160,000 reviews.
             if filedic['business_id'] in self.Businesses:
-                self.Reviews[filedic['review_id']] = filedic
                 count=count+1
+                if count%5==0:
+                    #20% of the reviews in the training set; 32,000.
+                    self.TrainingReviews[filedic['review_id']] = filedic
+                elif count%5==1:
+                    #20% more of the reviews in the test set; another 32,000.
+                    self.TestReviews[filedic['review_id']] = filedic
+                else:
+                    #The rest of the reviews in the validation set. 96,000. All these are estimates.
+                    self.ValidationReviews[filedic['review_id']] = filedic
+
             if count%10000==0:
                 print(count)
                 print(json.dumps(filedic,sort_keys=True, indent=3))
@@ -289,8 +302,23 @@ class Test_junk:
         return returnVal
     
     
-    def base_tree(self, reviewDictionary):
+    def base_tree(self):
+        starttime=time.time()
+        base_decision_tree=self.build_base_node(self.TrainingReviews)
+        endtime=time.time()
+        print('Decision tree generated in ' + (str) (endtime-starttime) + ' seconds.')
+        starttime=time.time()
+        accuracy=self.classify_all(base_decision_tree,self.ValidationReviews)
+        endtime=time.time()
+        print('Decision tree evaluated in ' + (str) (endtime-starttime) + ' seconds.')
+        print('Accuracy rate is  ' + (str)(accuracy) + ' percent.')
+        
         return 0
+    
+    def sorted_tree(self):
+        start
+        starttime=time.time()
+        
     
     #This classification function doesn't output the actual classification, and is purely for use on validation/testing data.
     #Returns a number between 0 and 1 reflecting classification accuracy.
@@ -311,8 +339,8 @@ class Test_junk:
         if 'Split By' in decision_tree:
             #This is a quick way to grab the single data entry for the thing we're classifying.
             onereviewdictionary={}
-            onereviewdictionary[entry_dictionary['reviewid']]=entry_dictionary
-            classificationcriteria=get_attribute_dataset(decision_tree['Split By'],onereviewdictionary)
+            onereviewdictionary[entry_dictionary['review_id']]=entry_dictionary
+            classificationcriteria=self.get_attribute_dataset(decision_tree['Split By'],onereviewdictionary)
             if decision_tree['Split By']['Existence']==True:
                 if classificationcriteria[0][0]==True:
                     return self.classify_entry(decision_tree['Nodes'][1],entry_dictionary) #Hehe, true entries are 1.
@@ -337,6 +365,9 @@ class Test_junk:
         
         #Node entropy
         result['Entropy']=self.calculate_node_entropy(training_dictionary)
+        currententropy=result['Entropy']
+        
+        print('Now classifying set of ' + len(training_dictionary) + 'items')
         
         if len(training_dictionary)>5 and sort_level<len(self.Attributes):
             sortingattribute=self.Attributes[sort_level]
@@ -345,24 +376,26 @@ class Test_junk:
             if sortingattribute['Existence']==False:
                 #Numeric variable, going to do a single-point split based on best entropy because it's linear.
                 splitdata=self.calculate_best_split(training_dictionary, workingset)
-                if splitdata[1]<result['Entropy']:
+                if splitdata[1]<currententropy:
+                    currententropy=splitdata[1]
                     result['Split By']=sortingattribute
                     result['Nodes']=self.split_dictionary(sortingattribute['Existence'],splitdata[0],workingset,training_dictionary)
                     result['Breakpoint']=splitdata[0]
-                    for item in result['Nodes']:
-                        item=self.build_sorted_node(item,sort_level+1)
+                    for i in range(2):
+                        result['Nodes'][i]=self.build_sorted_node(result['Nodes'][i],sort_level+1)
                 else:
                     #If this attribute can't improve entropy measure, just build this node with the next attribute in the order.
                     return self.build_sorted_node(training_dictionary, sort_level+1)
             else:
                 #Boolean variable. True/False Split.
                 tempentropy=self.set_entropy(len([item for item in workingset if workingset[0]==True]),len([item for item in workingset if workingset[0]==False]))
-                if tempentropy<result['Entropy']:
+                if tempentropy['Entropy']<currententropy:
+                    currententropy=tempentropy['Entropy']
                     result['Split By']=sortingattribute
                     result['Nodes']=self.split_dictionary(sortingattribute['Existence'],0,workingset,training_dictionary)
                     result['Breakpoint']=splitdata[0]
-                    for item in result['Nodes']:
-                        item=self.build_sorted_node(item,sort_level+1)
+                    for i in range(2):
+                        result['Nodes'][i]=self.build_sorted_node(result['Nodes'][i],sort_level+1)
                 else:
                     return self.build_sorted_node(training_dictionary, sort_level+1)
         return result
@@ -375,6 +408,8 @@ class Test_junk:
         
         #Node entropy
         result['Entropy']=self.calculate_node_entropy(training_dictionary)
+        
+        print('Now classifying set of ' + (str)(len(training_dictionary)) + 'items')
         
         #If there's fewer than a given number of items in the node (let's say 6), we stop splitting.
         #Sparse data risks overtuning.
@@ -398,22 +433,27 @@ class Test_junk:
                             usedattribute=attributeindex
                     else:
                         #Boolean variable. True/False Split.
-                        tempentropy=self.set_entropy(len([item for item in workingset if workingset[0]==True]),len([item for item in workingset if workingset[0]==False]))
-                        if tempentropy<currentEntropy:
-                            currentEntropy=tempentropy
-                            splitAttribute=item
-                            usedattribute=attributeindex
+                        truecount=len([item for item in workingset if workingset[0]==True])
+                        falsecount=len([item for item in workingset if workingset[0]==False])
+                        if truecount>0 and falsecount>0:
+                            tempentropy=self.set_entropy([truecount,falsecount])
+                            if tempentropy<currentEntropy:
+                                currentEntropy=tempentropy
+                                splitAttribute=item
+                                usedattribute=attributeindex
                 attributeindex=attributeindex+1
             #At this point we've iterated through attributes. Let's build the classification system, split the database and
             #build the nodes!
             if 'Name' in splitAttribute:
-                result['Split By']=self.splitAttribute
-                result['Nodes']=self.split_dictionary(splitAttribute['Existence'],breakpoint,get_attribute_dataset(splitAttribute, training_dictionary),training_dictionary)
+                result['Split By']=splitAttribute
+                result['Nodes']=self.split_dictionary(splitAttribute['Existence'],breakpoint,self.get_attribute_dataset(splitAttribute, training_dictionary),training_dictionary)
                 result['Breakpoint']=breakpoint
-                self.Attributes[usedattribute]=True
-                for item in result['Nodes']:
-                    item=self.build_base_node(item)
-                self.Attributes[usedattribute]=False
+                self.Attributes[usedattribute]['Used']=True
+                for i in range(2):
+                    result['Nodes'][i]=self.build_base_node(result['Nodes'][i])
+                #for item in result['Nodes']:
+                #    item=self.build_base_node(item)
+                self.Attributes[usedattribute]['Used']=False
         else:
             #Small nodes don't get split, want to minimize overtuning.
             pass
@@ -428,7 +468,7 @@ class Test_junk:
         lowsplit={}
         
         if boolean==True:
-            #the dataset is [amount,reviewid].
+            #the dataset is [amount,review_id].
             for item in dataset:
                 if item[0]==True:
                     highsplit[item[1]]=dictionary[item[1]]
@@ -443,51 +483,52 @@ class Test_junk:
         #
         return [lowsplit,highsplit]
     
-    #Given a sorted set of [value,reviewId], returns the best breakpoint and that breakpoint's entropy for a single decision tree split.
+    #Given a sorted set of [value,review_id], returns the best breakpoint and that breakpoint's entropy for a single decision tree split.
     def calculate_best_split(self, dictionary, dataset):
         count=[0,0,0,0,0]
         #does dictionary or list length return faster?
         totalsize=len(dataset)
-        class_name='review'
+        class_name='stars'
         count[0]=len([item for item in dictionary if dictionary[item][class_name] == 1])
         count[1]=len([item for item in dictionary if dictionary[item][class_name] == 2])
         count[2]=len([item for item in dictionary if dictionary[item][class_name] == 3])
         count[3]=len([item for item in dictionary if dictionary[item][class_name] == 4])
         count[4]=len([item for item in dictionary if dictionary[item][class_name] == 5])
-        #Returns tuples of [Value, ReviewId]. dictionary[item[0]] addresses a given review with the reviewId.
-        currententropy=self.set_entropy(count)
+        #Returns tuples of [Value, ReviewId]. dictionary[item[0]] addresses a given review with the review_id.
+        currententropy=self.set_entropy(count)['Entropy']
         currentbreakpoint=0
         secondcount=[0,0,0,0,0]
         
         for item in dataset:
             #Old count minus one for stuff after the classification.
-            count[(dictionary[item[1]]['review']-1)]=count[(dictionary[item[1]]['review']-1)]-1
+            count[(dictionary[item[1]]['stars']-1)]=count[(dictionary[item[1]]['stars']-1)]-1
             #New count plus one for stuff before that classification.
-            secondcount[(dictionary[item[1]]['review']-1)]=count[(dictionary[item[1]]['review']-1)]+1
+            secondcount[(dictionary[item[1]]['stars']-1)]=count[(dictionary[item[1]]['stars']-1)]+1
             #Let's calculate the breakpoint and entropy for this split.
             tempbreakpoint=item[0]
-            tempentropy=self.split_entropy([self.set_entropy(count),self.set_entropy(count)],totalsize)
-            if tempentropy<currententropy:
-                currententropy=tempentropy
-                currentbreakpoint=tempbreakpoint
+            if sum(count)>0 and sum(secondcount)>0:
+                tempentropy=self.split_entropy([[self.set_entropy(count)['Entropy'],sum(count)],[self.set_entropy(secondcount)['Entropy'],sum(secondcount)]])
+                if tempentropy<currententropy:
+                    currententropy=tempentropy
+                    currentbreakpoint=tempbreakpoint
         return [currentbreakpoint,currententropy]
     
     #Uses the given attribute (a dictionary entry from Attributes)
     #and extracts the corresponding attribute data
-    #first as a list of items in the dictionary format {BusinessID=<businessid> attribute=<content>} if necessary
-    #then turns that into a list of [reviewId, linkingId, attribute].
-    #Then it reduces it and returns [reviewId, attribute], sorted.
+    #first as a list of items in the dictionary format {BusinessID=<business_id> attribute=<content>} if necessary
+    #then turns that into a list of [review_id, linkingId, attribute].
+    #Then it reduces it and returns [review_id, attribute], sorted.
     def get_attribute_dataset(self, attribute, dictionary):
         returnval=[]
         metaval=[]
         if attribute['Name']=='Business State':
-            returnval=[[self.Reviews[key]['reviewId'], self.Reviews[key]['businessId']] for key in self.Reviews]
+            returnval=[[dictionary[key]['review_id'], dictionary[key]['business_id']] for key in dictionary]
             for item in returnval:
                 item.append(Businesses[item[1]][''])
                 pass
             
         elif attribute['Name']=='Business Hours':
-            returnval=[[self.Reviews[key]['reviewId'], self.Reviews[key]['businessId']] for key in self.Reviews]
+            returnval=[[dictionary[key]['review_id'], dictionary[key]['business_id']] for key in dictionary]
             for item in returnval:
                 if len(self.Businesses[item[1]]['hours'])>0:
                     #Could make this into a count measure of how many days they're open, but since some businesses don't
@@ -496,43 +537,43 @@ class Test_junk:
                 else:
                     item.append(False)
         elif attribute['Name']=='Business Categories':
-            returnval=[[self.Reviews[key]['reviewId'], self.Reviews[key]['businessId']] for key in self.Reviews]
+            returnval=[[dictionary[key]['review_id'], dictionary[key]['business_id']] for key in dictionary]
             for item in returnval:
                 item.append(len(self.Businesses[item[1]]['categories']))
         elif attribute['Name']=='Business review_count':
-            returnval=[[self.Reviews[key]['reviewId'], self.Reviews[key]['businessId']] for key in self.Reviews]
+            returnval=[[dictionary[key]['review_id'], dictionary[key]['business_id']] for key in dictionary]
             for item in returnval:
                 item.append(self.Businesses[item[1]]['review_count'])
         elif attribute['Name']=='Business Stars':
-            returnval=[[self.Reviews[key]['reviewId'], self.Reviews[key]['businessId']] for key in self.Reviews]
+            returnval=[[dictionary[key]['review_id'], dictionary[key]['business_id']] for key in dictionary]
             for item in returnval:
                 item.append(self.Businesses[item[1]]['stars'])
         elif attribute['Name']=='Review Year':
             #Could concatenate review month and day at the end, I suppose? Will think about that.
-            returnval=[[self.Reviews[key]['reviewId'], self.Reviews[key]['reviewId'], self.Reviews[key]['date'][:4]] for key in self.Reviews]
+            returnval=[[dictionary[key]['review_id'], dictionary[key]['review_id'], dictionary[key]['date'][:4]] for key in dictionary]
         elif attribute['Name']=='Review Text':
             #To do: Implement.
             pass
         elif attribute['Name']=='Review Votes':
-            returnval=[[self.Reviews[key]['reviewId'], self.Reviews[key]['reviewId'], self.dictionaryitemcount(Reviews[key]['votes'])] for key in self.Reviews]
+            returnval=[[dictionary[key]['review_id'], dictionary[key]['review_id'], self.dictionaryitemcount(dictionary[key]['votes'])] for key in dictionary]
         elif attribute['Name']=='User average_stars':
-            returnval=[[self.Reviews[key]['reviewId'], self.Reviews[key]['userId']] for key in self.Reviews]
+            returnval=[[dictionary[key]['review_id'], dictionary[key]['user_id']] for key in dictionary]
             for item in returnval:
                 item.append(self.Users[item[1]]['average_stars'])
         elif attribute['Name']=='User fans':
-            returnval=[[self.Reviews[key]['reviewId'], self.Reviews[key]['userId']] for key in self.Reviews]
+            returnval=[[dictionary[key]['review_id'], dictionary[key]['user_id']] for key in dictionary]
             for item in returnval:
                 item.append(self.Users[item[1]]['fans'])
         elif attribute['Name']=='User friends Count':
-            returnval=[[self.Reviews[key]['reviewId'], self.Reviews[key]['userId']] for key in self.Reviews]
+            returnval=[[dictionary[key]['review_id'], dictionary[key]['user_id']] for key in dictionary]
             for item in returnval:
                 item.append(len(self.Users[item[1]]['friends']))
         elif attribute['Name']=='User review_count':
-            returnval=[[self.Reviews[key]['reviewId'], self.Reviews[key]['userId']] for key in self.Reviews]
+            returnval=[[dictionary[key]['review_id'], dictionary[key]['user_id']] for key in dictionary]
             for item in returnval:
                 item.append(self.Users[item[1]]['review_count'])
         elif attribute['Name']=='User votes Count':
-            returnval=[[self.Reviews[key]['reviewId'], self.Reviews[key]['userId']] for key in self.Reviews]
+            returnval=[[dictionary[key]['review_id'], dictionary[key]['user_id']] for key in dictionary]
             for item in returnval:
                 item.append(self.dictionaryitemcount(self.Users[item[1]]['votes']))
         elif attribute['Name']=='':
@@ -546,13 +587,13 @@ class Test_junk:
         total_count=len(review_dictionary)
         if total_count==0:
             return 0
-        class_name='review'
-        count=[len([item for item in dictionary if review_dictionary[item][class_name] == 1]),len([item for item in dictionary if review_dictionary[item][class_name] == 2]),len([item for item in dictionary if review_dictionary[item][class_name] == 3]),len([item for item in dictionary if review_dictionary[item][class_name] == 4]),len([item for item in dictionary if review_dictionary[item][class_name] == 5])]
-        return self.set_entropy(count)
+        class_name='stars'
+        count=[len([item for item in review_dictionary if review_dictionary[item][class_name] == 1]),len([item for item in review_dictionary if review_dictionary[item][class_name] == 2]),len([item for item in review_dictionary if review_dictionary[item][class_name] == 3]),len([item for item in review_dictionary if review_dictionary[item][class_name] == 4]),len([item for item in review_dictionary if review_dictionary[item][class_name] == 5])]
+        return self.set_entropy(count)['Entropy']
     
     #Takes reviews, returns a 1-5 reflecting the most common review (with lower review bias for ties).
     def count_most_common_class(self, dictionary):
-        class_name='review'
+        class_name='stars'
         highest=1
         count=len([item for item in dictionary if dictionary[item][class_name] == 1])
         for i in range(2,8,1):
@@ -604,3 +645,5 @@ class Test_junk:
 
 Stuff = Test_junk()
 
+#Stuff.base_tree()
+Stuff.sorted_tree()
